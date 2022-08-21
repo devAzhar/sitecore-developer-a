@@ -1,0 +1,123 @@
+namespace NumberPrinter
+{
+    using System;
+    using System.Collections.Generic;
+
+    public interface INumberFormatter
+    {
+        string FormatNumber(int number);
+    }
+    public class DefaultNumberFormatter : INumberFormatter
+    {
+        public virtual string FormatNumber(int number) => number.ToString();
+    }
+    public class RemainderNumberFormatter : DefaultNumberFormatter
+    {
+        private const int MIN_VALUE = 0;
+        private const int MAX_VALUE = 10;
+        private static readonly List<string> Words = new List<string> { "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten" };
+
+        public override string FormatNumber(int number)
+        {
+            if (number >= MIN_VALUE && number <= MAX_VALUE)
+            {
+                return Words[number];
+            }
+
+            return base.FormatNumber(number);
+        }
+    }
+
+    public interface INumberFormatterRule
+    {
+        string GetNumberString(int number);
+    }
+    public class DefaultNumberFormatterRule : INumberFormatterRule
+    {
+        private readonly INumberFormatter NumberFormatter;
+
+        public DefaultNumberFormatterRule()
+        {
+            this.NumberFormatter = new DefaultNumberFormatter();
+        }
+
+        public string GetNumberString(int number) => this.NumberFormatter.FormatNumber(number);
+    }
+    public class RemainderNumberFormatterRule : INumberFormatterRule
+    {
+        private readonly int Divisor;
+        private readonly INumberFormatter NumberFormatter;
+        public RemainderNumberFormatterRule(int divisor)
+        {
+            this.Divisor = divisor;
+            this.NumberFormatter = new RemainderNumberFormatter();
+        }
+
+        public string GetNumberString(int number)
+        {
+            if (number % this.Divisor == 0)
+            {
+                return this.NumberFormatter.FormatNumber(this.Divisor);
+            }
+
+            return string.Empty;
+        }
+    }
+
+    public static class NumberFormatter
+    {
+        private static List<INumberFormatterRule> RemainderRules = new List<INumberFormatterRule>();
+        private static INumberFormatterRule DefaultRule = new DefaultNumberFormatterRule();
+
+        static NumberFormatter()
+        {
+            RemainderRules.Clear();
+            RemainderRules.Add(new RemainderNumberFormatterRule(3));
+            RemainderRules.Add(new RemainderNumberFormatterRule(5));
+        }
+
+        public static string FormatNumber(int number)
+        {
+            var formattedNumber = string.Empty;
+
+            foreach (var rule in RemainderRules)
+            {
+                formattedNumber += rule.GetNumberString(number);
+            }
+
+            if (string.IsNullOrEmpty(formattedNumber))
+            {
+                formattedNumber = DefaultRule.GetNumberString(number);
+            }
+
+            return formattedNumber;
+        }
+    }
+
+    class Program
+    {
+        private static List<string> GetNumbers(int start, int end)
+        {
+            List<string> outputList = new List<string>();
+
+            for (var number = start; number <= end; number++)
+            {
+                outputList.Add(NumberFormatter.FormatNumber(number));
+            }
+
+            return outputList;
+        }
+
+        static void Main(string[] args)
+        {
+            var list = GetNumbers(1, 250);
+
+            foreach (var line in list)
+            {
+                Console.WriteLine(line);
+            }
+
+            Console.ReadKey();
+        }
+    }
+}
