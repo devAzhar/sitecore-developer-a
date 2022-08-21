@@ -1,0 +1,51 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace NumberPrinter
+{
+    class Program
+    {
+        private static List<string> GetNumbers(int start, int end)
+        {
+            List<string> outputList = new List<string>();
+
+            for (var number = start; number <= end; number++)
+            {
+                var output = "";
+
+                if (number % 3 == 0)
+                {
+                    output += "Three";
+                }
+                if (number % 5 == 0)
+                {
+                    output += "Five";
+                }
+
+                if (string.IsNullOrEmpty(output))
+                {
+                    output = number.ToString();
+                }
+
+                outputList.Add(output);
+            }
+
+            return outputList;
+        }
+
+        static void Main(string[] args)
+        {
+            var list = GetNumbers(1, 250);
+
+            foreach (var line in list)
+            {
+                Console.WriteLine(line);
+            }
+
+            Console.ReadKey();
+        }
+    }
+}
