@@ -204,3 +204,24 @@ You also need to provide configuration so that your implementation is used.
 As you can see the processor will only do something if your rendering variant will contain the defined token like {{ScribanCommonFunctions}}.
 
 Once your scriban has this token {{ScribanCommonFunctions}} at the top, the rest of the scriban will have access to all functions defined in the content tree. 
+
+
+**Disable password auth for PSE**
+```
+<?xml version="1.0"?>
+<configuration xmlns:patch="http://www.sitecore.net/xmlconfig/" xmlns:role="http://www.sitecore.net/xmlconfig/role/" xmlns:security="http://www.sitecore.net/xmlconfig/security/" xmlns:env="http://www.sitecore.net/xmlconfig/env/">
+  <sitecore env:require="Local or DEV or TEST" role:require="Standalone or ContentManagement" security:require="Sitecore">
+    <powershell>
+      <userAccountControl>
+        <tokens>
+          <token name="Default" expiration="00:00:00" elevationAction="Allow"/>
+          <token name="Console" expiration="00:05:00" elevationAction="Allow"/>
+          <token name="ISE" expiration="00:05:00" elevationAction="Allow"/>
+          <token name="ItemSave" expiration="00:05:00" elevationAction="Allow"/>
+        </tokens>
+      </userAccountControl>
+    </powershell>
+  </sitecore>
+</configuration>
+
+```
